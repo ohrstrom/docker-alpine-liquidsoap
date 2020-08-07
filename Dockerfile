@@ -19,7 +19,7 @@ RUN apk add --no-cache \
         curl \
         coreutils \
         musl-dev \
-        faad2-dev ffmpeg-dev lame-dev libmad-dev libsamplerate-dev taglib-dev \
+        faad2-dev ffmpeg-dev lame-dev libmad-dev libsamplerate-dev taglib-dev libvorbis-dev flac-dev \
         ocaml \
         ocaml-compiler-libs \
         opam
@@ -35,7 +35,7 @@ ENV OPAMROOT=/opt/opam
 
 RUN opam init -a -y --disable-sandboxing --root /opt/opam
 
-RUN eval $(opam env --root=/opt/opam) && opam install ffmpeg taglib mad lame cry samplerate faad -y
+RUN eval $(opam env --root=/opt/opam) && opam install ffmpeg taglib mad lame cry samplerate faad vorbis flac -y
 RUN opam pin add liquidsoap https://github.com/savonet/liquidsoap.git#1.4.2 -y
 
 
@@ -49,7 +49,9 @@ RUN apk add --no-cache \
         lame \
         libmad \
         libsamplerate \
-        taglib
+        taglib \
+        libvorbis \
+        flac
 
 RUN addgroup liquidsoap && adduser -D -s /bin/bash -G liquidsoap liquidsoap && \
     mkdir -p /opt/opam/default/lib/liquidsoap/share/liquidsoap/1.4.2/libs/ && \
@@ -63,5 +65,7 @@ COPY --from=liquidsoap-builder \
 RUN chmod +x /opt/opam/default/bin/liquidsoap && \
     ln -s /opt/opam/default/bin/liquidsoap /usr/local/bin/liquidsoap
 
-CMD [ "/bin/bash" ]
+ENTRYPOINT ["liquidsoap"]
+
+CMD ["--help"]
 
